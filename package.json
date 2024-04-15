@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/JordanBandur/tinyapp/issues"
   },
-  "homepage": "https://github.com/JordanBandur/tinyapp#readme"
+  "homepage": "https://github.com/JordanBandur/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
 }
