@@ -23,10 +23,11 @@
         <!-- Update Form -->
         <form action="/urls/<%= id %>/update" method="POST" class="mt-4">
           <div class="form-group">
-            <label for="newURL">Update URL:</label>
-            <input type="url" class="form-control" id="newURL" name="newURL" placeholder="Enter new URL" required>
+            <label for="newURL" class="d-inline-block mr-2">Update URL:</label>
+            <input type="url" class="form-control d-inline-block mr-2" style="width: auto;" id="newURL" name="newURL"
+              placeholder="Enter new URL" required>
+            <button type="submit" class="btn btn-primary d-inline-block">Update</button>
           </div>
-          <button type="submit" class="btn btn-primary">Update URL</button>
         </form>
       </div>
       <div class="card-footer text-muted"></div>
