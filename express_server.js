@@ -26,10 +26,14 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
+});
+
 app.get("/urls/:id", (req, res) => {
   const id = req.params.id;
   const longURL = urlDatabase[id]; // Retrieve the long URL using the id from the urlDatabase
-  const templateVars = { id: id, longURL: longURL};
+  const templateVars = { id: id, longURL: longURL };
   res.render("urls_show", templateVars);
 });
 
