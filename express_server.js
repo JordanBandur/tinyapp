@@ -40,8 +40,9 @@ app.get("/urls", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
-  res.send("Ok"); // Respond with 'Ok' (we will replace this)
+  const shortURL = generateRandomString(); // Generate a short URL identifier
+  urlDatabase[shortURL] = req.body.longURL;
+  res.redirect(`/urls/${shortURL}`); // Redirect to the page showing the new short URL
 });
 
 app.get("/urls/new", (req, res) => {
