@@ -45,6 +45,16 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortURL}`); // Redirect to the page showing the new short URL
 });
 
+app.post("/urls/:id/delete", (req, res) => {
+  const id = req.params.id; // Get the ID from the URL parameter
+  if (urlDatabase[id]) {
+    delete urlDatabase[id];
+    res.redirect('/urls');
+  } else {
+    res.status(404).send('URL not found');
+  }
+});
+
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
