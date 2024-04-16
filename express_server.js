@@ -8,6 +8,17 @@ const urlDatabase = {
   b2xVn2: "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
 };
+
+const generateRandomString = function() {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < 6; i++) {
+    const index = Math.floor(Math.random() * characters.length); // generates a random index for characters
+    result += characters[index]; // adds the random generated index to select from characters
+  }
+  return result;
+};
+
 // express built-in middelware. parses the request body from the request into a string
 app.use(express.urlencoded({ extended: true }));
 
