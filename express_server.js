@@ -26,6 +26,13 @@ app.get("/urls", (req, res) => {
   res.render(urlDatabase, templateVars);
 });
 
+app.get("/urls/:id", (req, res) => {
+  const id = req.params.id;
+  const longURL = urlDatabase[id]; // Retrieve the long URL using the id from the urlDatabase
+  const templateVars = { id: id, longURL: longURL};
+  res.render("urls_show", templateVars);
+});
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
