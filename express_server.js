@@ -97,9 +97,11 @@ app.post("/logout", (req, res) => {
   res.clearCookie('username'); // Set a cookie named 'username' with the value from the body
   res.redirect('/urls');
 });
-// Display the page for creating new URLs
+// Display the page for creating new URLs and pass the user object
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const userId = req.cookies["user_id"];
+  const user = users[userId];
+  res.render("urls_new", { user: user });
 });
 // Detail view for a single short URL
 app.get("/urls/:id", (req, res) => {
