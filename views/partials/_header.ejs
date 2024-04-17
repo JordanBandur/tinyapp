@@ -12,9 +12,22 @@
       </div>
     </div>
     <!-- Login form -->
-    <form method="POST" action="/login" class="form-inline my-2 my-lg-0">
-      <input type="text" class="form-control mr-sm-2" id="username" name="username" placeholder="Username">
-      <button type="submit" class="btn btn-primary my-2 my-sm-0">Login</button>
-    </form>
+     <% if (typeof username !== 'undefined' && username) { %>
+        <span class="navbar-text mr-3">
+          Signed in as: <%= username %>
+        </span>
+      <% } %>
+    </div>
+    <!-- Login form -->
+    <% if (typeof username === 'undefined' || !username) { %>
+      <form method="POST" action="/login" class="form-inline my-2 my-lg-0">
+        <input type="text" class="form-control mr-sm-2" id="username" name="username" placeholder="Username">
+        <button type="submit" class="btn btn-primary my-2 my-sm-0">Login</button>
+      </form>
+    <% } else { %>
+      <form method="POST" action="/logout" class="form-inline my-2 my-lg-0">
+        <button type="submit" class="btn btn-danger my-2 my-sm-0">Logout</button>
+      </form>
+    <% } %>
   </nav>
 </header>
