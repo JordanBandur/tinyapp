@@ -79,6 +79,11 @@ app.post("/login", (req, res) => {
   }
 });
 
+app.post("/logout", (req, res) => {
+  res.clearCookie('username'); // Set a cookie named 'username' with the value from the body
+  res.redirect('/urls');
+});
+
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
