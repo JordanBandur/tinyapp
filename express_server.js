@@ -68,6 +68,16 @@ app.post("/urls/:id/delete", (req, res) => {
   }
 });
 
+app.post("/login", (req, res) => {
+  const username = req.body.username;
+  if (username) {
+    res.cookie('username', username); // Set a cookie named 'username' with the value from the body
+    res.redirect('/urls');
+  } else {
+    res.status(400).send('No username provided');
+  }
+});
+
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
