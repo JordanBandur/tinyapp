@@ -9,6 +9,10 @@ app.set("view engine", "ejs");// Set EJS as the templating engine
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+///////////////////////////////////////////////////////
+// Data storage
+///////////////////////////////////////////////////////
+
 const urlDatabase = {
   b2xVn2: "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
@@ -26,6 +30,10 @@ const users = {
     password: "dishwasher-funk",
   },
 };
+
+///////////////////////////////////////////////////////
+// Helper functions
+///////////////////////////////////////////////////////
 
 const generateRandomString = function() {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -46,6 +54,10 @@ const getUserByEmail = function(email) {
   return null;
 };
 
+///////////////////////////////////////////////////////
+// Basic routes
+///////////////////////////////////////////////////////
+
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -57,6 +69,11 @@ app.get("/hello", (req, res) => {
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
+
+///////////////////////////////////////////////////////
+// URL management routes
+///////////////////////////////////////////////////////
+
 // Main page for URL listing, passing user object and URLs to the template
 app.get("/urls", (req, res) => {
   const userId = req.cookies["user_id"];
@@ -64,12 +81,14 @@ app.get("/urls", (req, res) => {
   const templateVars = { user: user, urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
+
 // Endpoint to handle creation of short URLs
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString(); // Generate a short URL identifier
   urlDatabase[shortURL] = req.body.longURL;
   res.redirect(`/urls/${shortURL}`); // Redirect to the page showing the new short URL
 });
+
 // Endpoint to update an existing URL
 app.post("/urls/:id/update", (req, res) => {
   const id = req.params.id; // Get the ID from the URL parameter
@@ -81,6 +100,7 @@ app.post("/urls/:id/update", (req, res) => {
     res.status(404).send('URL not found');
   }
 });
+
 // Endpoint for deleting URLs
 app.post("/urls/:id/delete", (req, res) => {
   const id = req.params.id; // Get the ID from the URL parameter
@@ -91,22 +111,7 @@ app.post("/urls/:id/delete", (req, res) => {
     res.status(404).send('URL not found');
   }
 });
-// Handle user login, setting a cookie with user ID
-app.post("/login", (req, res) => {
-  const { email, password } = req.body;
-  const user = getUserByEmail(email);
 
-  if (user && user.password === password) {
-    res.cookie('user_id', user.id);
-    res.redirect('/urls');
-  }
-  res.status(401).send('Invalid credentials');
-});
-// Handle user logout, clearing the username cookie
-app.post("/logout", (req, res) => {
-  res.clearCookie('user_id'); // Clear the 'user_id' cookie
-  res.redirect('/urls');
-});
 // Display the page for creating new URLs and pass the user object
 app.get("/urls/new", (req, res) => {
   const userId = req.cookies["user_id"];
@@ -131,6 +136,28 @@ app.get("/u/:id", (req, res) => {
   } else {
     res.status(404).send('URL not found');
   }
+});
+
+///////////////////////////////////////////////////////
+// User auth routes
+///////////////////////////////////////////////////////
+
+// Handle user login, setting a cookie with user ID
+app.post("/login", (req, res) => {
+  const { email, password } = req.body;
+  const user = getUserByEmail(email);
+
+  if (user && user.password === password) {
+    res.cookie('user_id', user.id);
+    res.redirect('/urls');
+  }
+  res.status(401).send('Invalid credentials');
+});
+
+// Handle user logout, clearing the username cookie
+app.post("/logout", (req, res) => {
+  res.clearCookie('user_id'); // Clear the 'user_id' cookie
+  res.redirect('/urls');
 });
 
 ///////////////////////////////////////////////////////
@@ -167,7 +194,6 @@ app.post("/register", (req, res) => {
 
   // set a cookie named 'user_id' with new user ID
   res.cookie('user_id', userID);
-
   res.redirect('/urls');
 });
 
