@@ -1,8 +1,12 @@
 const express = require("express");
+const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = 8080; // default port 8080
 
 app.set("view engine", "ejs");
+// express built-in middelware. parses the request body from the request into a string
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 const urlDatabase = {
   b2xVn2: "http://www.lighthouselabs.ca",
@@ -19,9 +23,6 @@ const generateRandomString = function() {
   return result;
 };
 
-// express built-in middelware. parses the request body from the request into a string
-app.use(express.urlencoded({ extended: true }));
-
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -35,7 +36,7 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = { username: req.cookies["username"], urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
 
@@ -85,7 +86,7 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   const id = req.params.id;
   const longURL = urlDatabase[id]; // Retrieve the long URL using the id from the urlDatabase
-  const templateVars = { id: id, longURL: longURL };
+  const templateVars = { username: req.cookies["username"], id: id, longURL: longURL };
   res.render("urls_show", templateVars);
 });
 
