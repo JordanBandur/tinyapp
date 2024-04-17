@@ -11,19 +11,23 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
     </div>
-    <!-- Login form -->
+    <!-- Login and Logout Forms -->
     <% if (user && user.email) { %> <!-- Checking if user object exists and has an email -->
-      <div class="navbar-text mr-3">
-        Signed in as: <%= user.email %>
-          <form method="POST" action="/logout" class="form-inline">
-            <button type="submit" class="btn btn-danger my-2 my-sm-0">Logout</button>
-          </form>
+      <div class="navbar-nav ml-auto">
+        <div class="nav-item navbar-text mr-3">
+          Signed in as: <%= user.email %>
+        </div>
+        <form method="POST" action="/logout" class="form-inline my-2 my-lg-0">
+          <button type="submit" class="btn btn-danger my-2 my-sm-0">Logout</button>
+        </form>
       </div>
       <% } else { %> <!-- Display login form if no user is logged in -->
-        <form method="POST" action="/login" class="form-inline my-2 my-lg-0">
-          <input type="text" class="form-control mr-sm-2" id="username" name="username" placeholder="Username">
-          <button type="submit" class="btn btn-primary my-2 my-sm-0">Login</button>
-        </form>
+        <div class="navbar-nav ml-auto">
+          <form method="POST" action="/login" class="form-inline my-2 my-lg-0">
+            <input type="text" class="form-control mr-sm-2" id="username" name="username" placeholder="Username">
+            <button type="submit" class="btn btn-primary my-2 my-sm-0">Login</button>
+          </form>
+        </div>
         <% } %>
   </nav>
 </header>
