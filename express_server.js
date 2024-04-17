@@ -82,19 +82,20 @@ app.post("/urls/:id/delete", (req, res) => {
     res.status(404).send('URL not found');
   }
 });
-// Handle user login, setting a cookie with the username
+// Handle user login, setting a cookie with user ID
 app.post("/login", (req, res) => {
-  const username = req.body.username;
-  if (username) {
-    res.cookie('username', username); // Set a cookie named 'username' with the value from the body
-    res.redirect('/urls');
-  } else {
-    res.status(400).send('No username provided');
+  const { email, password } = req.body;
+  for (const userId in users) {
+    if (users[userId].email === email && users[userId].password === password) {
+      res.cookie('user_id', userId);
+      return res.redirect('/urls');
+    }
   }
+  res.status(401).send('Invalid credentials');
 });
 // Handle user logout, clearing the username cookie
 app.post("/logout", (req, res) => {
-  res.clearCookie('username'); // Set a cookie named 'username' with the value from the body
+  res.clearCookie('user_id'); // Clear the 'user_id' cookie
   res.redirect('/urls');
 });
 // Display the page for creating new URLs and pass the user object
