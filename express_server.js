@@ -48,9 +48,11 @@ app.get("/hello", (req, res) => {
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
-// Main page for URL listing, passing username and URLs to the template
+// Main page for URL listing, passing user object and URLs to the template
 app.get("/urls", (req, res) => {
-  const templateVars = { username: req.cookies["username"], urls: urlDatabase };
+  const userId = req.cookies["user_id"];
+  const user = users[userId];
+  const templateVars = { user: user, urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
 // Endpoint to handle creation of short URLs
