@@ -103,6 +103,17 @@ app.get("/u/:id", (req, res) => {
     res.status(404).send('URL not found');
   }
 });
+// Route to display the registration form
+app.get("/register", (req, res) => {
+  res.render("register");
+});
+// Route to handle the POST request from the registration form
+app.post("/register", (req, res) => {
+  const { email, password } = req.body;
+  // Process the registration (e.g., save to database, validation)
+  // For now, just return a simple message
+  res.send(`Registered with email: ${email}`);
+});
 // Start the server
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
