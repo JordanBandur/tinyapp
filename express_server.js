@@ -1,7 +1,7 @@
 const express = require("express");
 const cookieParser = require('cookie-parser');
 const app = express();
-const PORT = 8080; // default port 8080
+const PORT = 8080; // Default port 8080
 
 app.set("view engine", "ejs");// Set EJS as the templating engine
 
@@ -14,12 +14,25 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com",
 };
 
+const users = {
+  userRandomID: {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur",
+  },
+  user2RandomID: {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk",
+  },
+};
+
 const generateRandomString = function() {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let result = '';
   for (let i = 0; i < 6; i++) {
-    const index = Math.floor(Math.random() * characters.length); // generates a random index for characters
-    result += characters[index]; // adds the random generated index to select from characters
+    const index = Math.floor(Math.random() * characters.length); // Generates a random index for characters
+    result += characters[index]; // Adds the random generated index to select from characters
   }
   return result;
 };
@@ -96,24 +109,53 @@ app.get("/urls/:id", (req, res) => {
 // Redirect from a short URL to the actual URL
 app.get("/u/:id", (req, res) => {
   const shortURL = req.params.id;
-  const longURL = urlDatabase[shortURL]; // gets the longURL associated with the shortURL then redirects
+  const longURL = urlDatabase[shortURL]; // Gets the longURL associated with the shortURL then redirects
   if (longURL) {
     res.redirect(longURL);
   } else {
     res.status(404).send('URL not found');
   }
 });
+
+///////////////////////////////////////////////////////
+// Register
+///////////////////////////////////////////////////////
+
 // Route to display the registration form
 app.get("/register", (req, res) => {
   res.render("register");
 });
+
 // Route to handle the POST request from the registration form
 app.post("/register", (req, res) => {
   const { email, password } = req.body;
-  // Process the registration (e.g., save to database, validation)
-  // For now, just return a simple message
-  res.send(`Registered with email: ${email}`);
+
+  // Validation for email & password
+  if (!email || !password) {
+    return res.status(400).send('Email and/or password cannot be empty.');
+  }
+  // Check if email is already registered
+  for (const userId in users) {
+    if (users[userId].email === email) {
+      return res.status(400).send('Email already registered.');
+    }
+  }
+  // Generate a random user ID
+  const userID = generateRandomString();
+
+  // Create new user object
+  users[userID] = {
+    id: userID,
+    email: email,
+    password: password
+  };
+
+  // set a cookie named 'user_id' with new user ID
+  res.cookie('user_id', userID);
+
+  res.redirect('/urls');
 });
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
