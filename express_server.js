@@ -36,6 +36,15 @@ const generateRandomString = function() {
   }
   return result;
 };
+// helper function for getting a user by their email
+const getUserByEmail = function(email) {
+  for (const userId in users) {
+    if (users[userId].email === email) {
+      return users[userId];
+    }
+  }
+  return null;
+};
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -85,11 +94,11 @@ app.post("/urls/:id/delete", (req, res) => {
 // Handle user login, setting a cookie with user ID
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
-  for (const userId in users) {
-    if (users[userId].email === email && users[userId].password === password) {
-      res.cookie('user_id', userId);
-      return res.redirect('/urls');
-    }
+  const user = getUserByEmail(email);
+
+  if (user && user.password === password) {
+    res.cookie('user_id', user.id);
+    res.redirect('/urls');
   }
   res.status(401).send('Invalid credentials');
 });
@@ -142,11 +151,10 @@ app.post("/register", (req, res) => {
     return res.status(400).send('Email and/or password cannot be empty.');
   }
   // Check if email is already registered
-  for (const userId in users) {
-    if (users[userId].email === email) {
-      return res.status(400).send('Email already registered.');
-    }
+  if (getUserByEmail(email)) {
+    return res.status(400).send('Email already registered.');
   }
+
   // Generate a random user ID
   const userID = generateRandomString();
 
