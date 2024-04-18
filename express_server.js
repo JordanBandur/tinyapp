@@ -85,6 +85,10 @@ app.get("/urls", (req, res) => {
 
 // Endpoint to handle creation of short URLs
 app.post("/urls", (req, res) => {
+  const user = users[req.cookies["user_id"]] || null;
+  if (!user) { // If the user is not logged in, send an HTML message and do not add the URL to the "database"
+    return res.status(401).send('<html><body><p>You must be logged in to shorten URLs.</p></body></html>');
+  }
   const shortURL = generateRandomString(); // Generate a short URL identifier
   urlDatabase[shortURL] = req.body.longURL;
   res.redirect(`/urls/${shortURL}`); // Redirect to the page showing the new short URL
@@ -116,6 +120,9 @@ app.post("/urls/:id/delete", (req, res) => {
 // Display the page for creating new URLs and pass the user object
 app.get("/urls/new", (req, res) => {
   const user = users[req.cookies["user_id"]] || null;
+  if (!user) {
+    return res.redirect("/login"); // Redirect to login if the user is not logged in
+  }
   res.render("urls_new", { user: user });
 });
 
@@ -146,7 +153,7 @@ app.get("/u/:id", (req, res) => {
 // Route to display the login form
 app.get("/login", (req, res) => {
   const user = users[req.cookies["user_id"]] || null;
-  if (user) {
+  if (user) { // redirect client if user is already logged in
     return res.redirect("/urls");
   }
   res.render("login", { user });
@@ -185,7 +192,7 @@ app.post("/logout", (req, res) => {
 // Route to display the registration form
 app.get("/register", (req, res) => {
   const user = users[req.cookies["user_id"]] || null;
-  if (user) {
+  if (user) { // redirect client if user is already logged in
     return res.redirect("/urls");
   }
   res.render("register", { user });
