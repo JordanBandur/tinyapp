@@ -9,6 +9,7 @@ app.set("view engine", "ejs");// Set EJS as the templating engine
 
 // Middleware to parse request bodies and cookies
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(cookieSession({
   name: 'session',
   keys: ['key1', 'key2'], // These are the keys used to encrypt the cookie
