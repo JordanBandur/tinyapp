@@ -252,7 +252,7 @@ app.post("/logout", (req, res) => {
 
 // Route to display the registration form
 app.get("/register", (req, res) => {
-  const user = users[req.cookies["user_id"]] || null;
+  const user = users[req.session.user_id] || null;
   if (user) { // redirect client if user is already logged in
     return res.redirect("/urls");
   }
