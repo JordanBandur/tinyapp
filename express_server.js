@@ -118,6 +118,7 @@ app.get("/urls/new", (req, res) => {
   const user = users[req.cookies["user_id"]] || null;
   res.render("urls_new", { user: user });
 });
+
 // Detail view for a single short URL, and passes the user object
 app.get("/urls/:id", (req, res) => {
   const user = users[req.cookies["user_id"]] || null;
@@ -126,6 +127,7 @@ app.get("/urls/:id", (req, res) => {
   const templateVars = { user: user, id: id, longURL: longURL };
   res.render("urls_show", templateVars);
 });
+
 // Redirect from a short URL to the actual URL
 app.get("/u/:id", (req, res) => {
   const shortURL = req.params.id;
