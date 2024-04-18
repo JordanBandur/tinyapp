@@ -1,5 +1,5 @@
 const express = require("express");
-const cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
 const app = express();
 const PORT = 8080; // Default port 8080
@@ -8,7 +8,11 @@ app.set("view engine", "ejs");// Set EJS as the templating engine
 
 // Middleware to parse request bodies and cookies
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  keys: ['key1', 'key2'], // These are the keys used to encrypt the cookie
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours cookie expiration
+}));
 
 ///////////////////////////////////////////////////////
 // Data storage
@@ -95,7 +99,7 @@ app.get("/urls.json", (req, res) => {
 
 // Main page for URL listing, passing user object and URLs to the template
 app.get("/urls", (req, res) => {
-  const user = users[req.cookies["user_id"]] || null;
+  const user = users[req.session.user_id] || null;
   if (!user) {
     return res.status(401).send('Please log in or register.');
   }
@@ -106,7 +110,7 @@ app.get("/urls", (req, res) => {
 
 // Endpoint to handle creation of short URLs
 app.post("/urls", (req, res) => {
-  const user = users[req.cookies["user_id"]] || null;
+  const user = users[req.session.user_id] || null;
   if (!user) { // If the user is not logged in, send an HTML message and do not add the URL to the "database"
     return res.status(401).send('<html><body><p>You must be logged in to shorten URLs.</p></body></html>');
   }
@@ -117,7 +121,7 @@ app.post("/urls", (req, res) => {
 
 // Endpoint to update an existing URL
 app.post("/urls/:id/update", (req, res) => {
-  const user = users[req.cookies["user_id"]] || null;
+  const user = users[req.session.user_id] || null;
   const id = req.params.id;
 
   // Check if user is logged in
@@ -139,7 +143,7 @@ app.post("/urls/:id/update", (req, res) => {
 
 // Endpoint for deleting URLs
 app.post("/urls/:id/delete", (req, res) => {
-  const user = users[req.cookies["user_id"]] || null;
+  const user = users[req.session.user_id] || null;
   const id = req.params.id;
 
   // Check if user is logged in
@@ -161,7 +165,7 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // Display the page for creating new URLs and pass the user object
 app.get("/urls/new", (req, res) => {
-  const user = users[req.cookies["user_id"]] || null;
+  const user = users[req.session.user_id] || null;
   if (!user) {
     return res.redirect("/login"); // Redirect to login if the user is not logged in
   }
@@ -170,7 +174,7 @@ app.get("/urls/new", (req, res) => {
 
 // Detail view for a single short URL, and passes the user object
 app.get("/urls/:id", (req, res) => {
-  const user = users[req.cookies["user_id"]] || null;
+  const user = users[req.session.user_id] || null;
   const id = req.params.id;
 
   // Check if user is logged in
@@ -208,7 +212,7 @@ app.get("/u/:id", (req, res) => {
 
 // Route to display the login form
 app.get("/login", (req, res) => {
-  const user = users[req.cookies["user_id"]] || null;
+  const user = users[req.session.user_id] || null;
   if (user) { // redirect client if user is already logged in
     return res.redirect("/urls");
   }
@@ -224,7 +228,8 @@ app.post("/login", (req, res) => {
     // Compare submitted password with hashed password in the user object
     bcrypt.compare(password, user.password, (err, result) => {
       if (result) {
-        res.cookie('user_id', user.id);
+        // eslint-disable-next-line camelcase
+        req.session.user_id = user.id; // Set user_id in session
         return res.redirect('/urls');
       } else {
         return res.status(401).send('Invalid credentials');
@@ -237,7 +242,7 @@ app.post("/login", (req, res) => {
 
 // Handle user logout, clearing the user_id cookie
 app.post("/logout", (req, res) => {
-  res.clearCookie('user_id'); // Clear the 'user_id' cookie
+  req.session = null; // Clear the session
   res.redirect('/login');
 });
 
