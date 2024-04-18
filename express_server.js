@@ -40,15 +40,7 @@ const users = {
 ///////////////////////////////////////////////////////
 
 app.get("/", (req, res) => {
-  res.send("Hello!");
-});
-
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
-
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
+  res.redirect(302, '/login');
 });
 
 ///////////////////////////////////////////////////////
@@ -222,7 +214,7 @@ app.post("/register", (req, res) => {
   const { email, password } = req.body;
 
   // Validation for email & password
-  if (!email || !password) {
+  if (!email.trim() || !password) {
     return res.status(400).send('Email and/or password cannot be empty.');
   }
   // Check if email is already registered
@@ -230,15 +222,14 @@ app.post("/register", (req, res) => {
     return res.status(400).send('Email already registered.');
   }
 
-  // Generate a random user ID
-  const userID = generateRandomString();
-
   // Hash the password before storing it
   bcrypt.hash(password, 10, (err, hash) => {
     if (err) {
       return res.status(500).send('Error while hashing the password.');
     }
 
+    // Generate a random user ID
+    const userID = generateRandomString();
     // Create new user object with hashed password
     users[userID] = {
       id: userID,
@@ -247,7 +238,8 @@ app.post("/register", (req, res) => {
     };
 
     // Set a cookie named 'user_id' with the new user ID
-    res.cookie('user_id', userID);
+    // eslint-disable-next-line camelcase
+    req.session.user_id = userID;
     res.redirect('/urls');
   });
 });
