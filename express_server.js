@@ -146,6 +146,9 @@ app.get("/u/:id", (req, res) => {
 // Route to display the login form
 app.get("/login", (req, res) => {
   const user = users[req.cookies["user_id"]] || null;
+  if (user) {
+    return res.redirect("/urls");
+  }
   res.render("login", { user });
 });
 
@@ -182,6 +185,9 @@ app.post("/logout", (req, res) => {
 // Route to display the registration form
 app.get("/register", (req, res) => {
   const user = users[req.cookies["user_id"]] || null;
+  if (user) {
+    return res.redirect("/urls");
+  }
   res.render("register", { user });
 });
 
