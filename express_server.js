@@ -96,10 +96,11 @@ app.get("/urls.json", (req, res) => {
 // Main page for URL listing, passing user object and URLs to the template
 app.get("/urls", (req, res) => {
   const user = users[req.cookies["user_id"]] || null;
-  const templateVars = { user: user, urls: urlDatabase };
   if (!user) {
     return res.status(401).send('Please log in or register.');
   }
+  const userUrls = urlsForUser(user.id); // Get URLs specific to the logged-in user
+  const templateVars = { user: user, urls: userUrls };
   res.render("urls_index", templateVars);
 });
 
