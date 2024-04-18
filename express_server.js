@@ -151,9 +151,20 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   const user = users[req.cookies["user_id"]] || null;
   const id = req.params.id;
-  if (!urlDatabase[id]) {
-    return res.status(404).send('The requested URL does not exist.');
+
+  // Check if user is logged in
+  if (!user) {
+    return res.status(401).send("Please log in to view this page.");
   }
+  // Check if the URL exists in the database
+  if (!urlDatabase[id]) {
+    return res.status(404).send("The requested URL does not exist.");
+  }
+  // Check if the logged in user owns the URL
+  if (urlDatabase[id].userID !== user.id) {
+    return res.status(403).send("You do not have permission to view this URL.");
+  }
+
   const longURL = urlDatabase[id].longURL;
   const templateVars = { user: user, id: id, longURL: longURL };
   res.render("urls_show", templateVars);
