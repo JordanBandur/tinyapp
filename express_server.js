@@ -117,14 +117,24 @@ app.post("/urls", (req, res) => {
 
 // Endpoint to update an existing URL
 app.post("/urls/:id/update", (req, res) => {
-  const id = req.params.id; // Get the ID from the URL parameter
-  const newURL = req.body.newURL;
-  if (urlDatabase[id]) {
-    urlDatabase[id].longURL = newURL; // Update the existing entry with the new URL
-    res.redirect('/urls');
-  } else {
-    res.status(404).send('URL not found');
+  const user = users[req.cookies["user_id"]] || null;
+  const id = req.params.id;
+
+  // Check if user is logged in
+  if (!user) {
+    return res.status(401).send("You must be logged in to update URLs.");
   }
+  // Check if the URL exists
+  if (!urlDatabase[id]) {
+    return res.status(404).send("The URL you are trying to update does not exist.");
+  }
+  // Check if the logged-in user owns the URL
+  if (urlDatabase[id].userID !== user.id) {
+    return res.status(403).send("You do not have permission to update this URL.");
+  }
+
+  urlDatabase[id].longURL = req.body.newURL;
+  res.redirect('/urls');
 });
 
 // Endpoint for deleting URLs
