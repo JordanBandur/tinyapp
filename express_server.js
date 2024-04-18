@@ -86,6 +86,9 @@ app.get("/urls.json", (req, res) => {
 app.get("/urls", (req, res) => {
   const user = users[req.cookies["user_id"]] || null;
   const templateVars = { user: user, urls: urlDatabase };
+  if (!user) {
+    return res.status(401).send('Please log in or register.');
+  }
   res.render("urls_index", templateVars);
 });
 
@@ -136,6 +139,9 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   const user = users[req.cookies["user_id"]] || null;
   const id = req.params.id;
+  if (!urlDatabase[id]) {
+    return res.status(404).send('The requested URL does not exist.');
+  }
   const longURL = urlDatabase[id].longURL;
   const templateVars = { user: user, id: id, longURL: longURL };
   res.render("urls_show", templateVars);
