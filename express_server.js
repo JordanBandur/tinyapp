@@ -62,6 +62,17 @@ const getUserByEmail = function(email) {
   return null;
 };
 
+// helper which returns the URLs where the userID is equal to the id of the currently logged-in user.
+const urlsForUser = function(id) {
+  const userUrls = {};
+  for (const urlId in urlDatabase) {
+    if (urlDatabase[urlId].userID === id) {
+      userUrls[urlId] = urlDatabase[urlId];
+    }
+  }
+  return userUrls;
+};
+
 ///////////////////////////////////////////////////////
 // Basic routes
 ///////////////////////////////////////////////////////
