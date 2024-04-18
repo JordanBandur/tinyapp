@@ -44,6 +44,7 @@ const generateRandomString = function() {
   }
   return result;
 };
+
 // helper function for getting a user by their email
 const getUserByEmail = function(email) {
   for (const userId in users) {
@@ -76,8 +77,7 @@ app.get("/urls.json", (req, res) => {
 
 // Main page for URL listing, passing user object and URLs to the template
 app.get("/urls", (req, res) => {
-  const userId = req.cookies["user_id"];
-  const user = users[userId];
+  const user = users[req.cookies["user_id"]] || null;
   const templateVars = { user: user, urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
@@ -114,14 +114,12 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // Display the page for creating new URLs and pass the user object
 app.get("/urls/new", (req, res) => {
-  const userId = req.cookies["user_id"];
-  const user = users[userId];
+  const user = users[req.cookies["user_id"]] || null;
   res.render("urls_new", { user: user });
 });
 // Detail view for a single short URL, and passes the user object
 app.get("/urls/:id", (req, res) => {
-  const userId = req.cookies["user_id"];
-  const user = users[userId];
+  const user = users[req.cookies["user_id"]] || null;
   const id = req.params.id;
   const longURL = urlDatabase[id];
   const templateVars = { user: user, id: id, longURL: longURL };
@@ -144,7 +142,8 @@ app.get("/u/:id", (req, res) => {
 
 // Route to display the login form
 app.get("/login", (req, res) => {
-  res.render("login");
+  const user = users[req.cookies["user_id"]] || null;
+  res.render("login", { user });
 });
 
 // Handle user login, setting a cookie with user ID
@@ -171,7 +170,8 @@ app.post("/logout", (req, res) => {
 
 // Route to display the registration form
 app.get("/register", (req, res) => {
-  res.render("register");
+  const user = users[req.cookies["user_id"]] || null;
+  res.render("register", { user });
 });
 
 // Route to handle the POST request from the registration form
