@@ -142,6 +142,11 @@ app.get("/u/:id", (req, res) => {
 // User auth routes
 ///////////////////////////////////////////////////////
 
+// Route to display the login form
+app.get("/login", (req, res) => {
+  res.render("login");
+});
+
 // Handle user login, setting a cookie with user ID
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
