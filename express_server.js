@@ -153,9 +153,9 @@ app.post("/login", (req, res) => {
 
   if (user && user.password === password) {
     res.cookie('user_id', user.id);
-    res.redirect('/urls');
+    return res.redirect('/urls');
   }
-  res.status(401).send('Invalid credentials');
+  return res.status(401).send('Invalid credentials');
 });
 
 // Handle user logout, clearing the user_id cookie
