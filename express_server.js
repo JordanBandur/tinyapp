@@ -1,7 +1,7 @@
 const express = require("express");
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
-const { getUserByEmail } = require("./helpers");
+const { getUserByEmail, generateRandomString, urlsForUser } = require("./helpers");
 const app = express();
 const PORT = 8080; // Default port 8080
 
@@ -35,31 +35,6 @@ const users = {
 };
 
 ///////////////////////////////////////////////////////
-// Helper functions
-///////////////////////////////////////////////////////
-
-const generateRandomString = function() {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let result = '';
-  for (let i = 0; i < 6; i++) {
-    const index = Math.floor(Math.random() * characters.length); // Generates a random index for characters
-    result += characters[index]; // Adds the random generated index to select from characters
-  }
-  return result;
-};
-
-// helper which returns the URLs where the userID is equal to the id of the currently logged-in user.
-const urlsForUser = function(id) {
-  const userUrls = {};
-  for (const urlId in urlDatabase) {
-    if (urlDatabase[urlId].userID === id) {
-      userUrls[urlId] = urlDatabase[urlId];
-    }
-  }
-  return userUrls;
-};
-
-///////////////////////////////////////////////////////
 // Basic routes
 ///////////////////////////////////////////////////////
 
@@ -85,7 +60,7 @@ app.get("/urls", (req, res) => {
   if (!user) {
     return res.status(401).send('Please log in or register.');
   }
-  const userUrls = urlsForUser(user.id); // Get URLs specific to the logged-in user
+  const userUrls = urlsForUser(user.id, urlDatabase); // Get URLs specific to the logged-in user
   const templateVars = { user: user, urls: userUrls };
   res.render("urls_index", templateVars);
 });
