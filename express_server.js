@@ -1,5 +1,6 @@
 const express = require("express");
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcrypt');
 const app = express();
 const PORT = 8080; // Default port 8080
 
@@ -151,11 +152,19 @@ app.post("/login", (req, res) => {
   const { email, password } = req.body;
   const user = getUserByEmail(email);
 
-  if (user && user.password === password) {
-    res.cookie('user_id', user.id);
-    return res.redirect('/urls');
+  if (user) {
+    // Compare submitted password with hashed password in the user object
+    bcrypt.compare(password, user.password, (err, result) => {
+      if (result) {
+        res.cookie('user_id', user.id);
+        return res.redirect('/urls');
+      } else {
+        return res.status(401).send('Invalid credentials');
+      }
+    });
+  } else {
+    return res.status(401).send('Invalid credentials');
   }
-  return res.status(401).send('Invalid credentials');
 });
 
 // Handle user logout, clearing the user_id cookie
@@ -190,16 +199,23 @@ app.post("/register", (req, res) => {
   // Generate a random user ID
   const userID = generateRandomString();
 
-  // Create new user object
-  users[userID] = {
-    id: userID,
-    email: email,
-    password: password
-  };
+  // Hash the password before storing it
+  bcrypt.hash(password, 10, (err, hash) => {
+    if (err) {
+      return res.status(500).send('Error while hashing the password.');
+    }
 
-  // set a cookie named 'user_id' with new user ID
-  res.cookie('user_id', userID);
-  res.redirect('/urls');
+    // Create new user object with hashed password
+    users[userID] = {
+      id: userID,
+      email: email,
+      password: hash // Storing the hashed password
+    };
+
+    // Set a cookie named 'user_id' with the new user ID
+    res.cookie('user_id', userID);
+    res.redirect('/urls');
+  });
 });
 
 // Start the server
