@@ -1,6 +1,7 @@
 const express = require("express");
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
+const { getUserByEmail } = require("./helpers");
 const app = express();
 const PORT = 8080; // Default port 8080
 
@@ -45,16 +46,6 @@ const generateRandomString = function() {
     result += characters[index]; // Adds the random generated index to select from characters
   }
   return result;
-};
-
-// helper function for getting a user by their email
-const getUserByEmail = function(email) {
-  for (const userId in users) {
-    if (users[userId].email === email) {
-      return users[userId];
-    }
-  }
-  return null;
 };
 
 // helper which returns the URLs where the userID is equal to the id of the currently logged-in user.
@@ -213,7 +204,7 @@ app.get("/login", (req, res) => {
 // Handle user login, setting a cookie with user ID
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
-  const user = getUserByEmail(email);
+  const user = getUserByEmail(email, users);
 
   if (user) {
     // Compare submitted password with hashed password in the user object
@@ -259,7 +250,7 @@ app.post("/register", (req, res) => {
     return res.status(400).send('Email and/or password cannot be empty.');
   }
   // Check if email is already registered
-  if (getUserByEmail(email)) {
+  if (getUserByEmail(email, users)) {
     return res.status(400).send('Email already registered.');
   }
 
