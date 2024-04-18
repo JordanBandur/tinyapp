@@ -159,10 +159,10 @@ app.post("/login", (req, res) => {
   res.status(401).send('Invalid credentials');
 });
 
-// Handle user logout, clearing the username cookie
+// Handle user logout, clearing the user_id cookie
 app.post("/logout", (req, res) => {
   res.clearCookie('user_id'); // Clear the 'user_id' cookie
-  res.redirect('/urls');
+  res.redirect('/login');
 });
 
 ///////////////////////////////////////////////////////
