@@ -96,7 +96,7 @@ app.post("/urls", (req, res) => {
     return res.status(401).send('<html><body><p>You must be logged in to shorten URLs.</p></body></html>');
   }
   const shortURL = generateRandomString(); // Generate a short URL identifier
-  urlDatabase[shortURL] = req.body.longURL;
+  urlDatabase[shortURL] = { longURL: req.body.longURL, userID: user.id };
   res.redirect(`/urls/${shortURL}`); // Redirect to the page showing the new short URL
 });
 
@@ -105,7 +105,7 @@ app.post("/urls/:id/update", (req, res) => {
   const id = req.params.id; // Get the ID from the URL parameter
   const newURL = req.body.newURL;
   if (urlDatabase[id]) {
-    urlDatabase[id] = newURL; // Update the existing entry with the new URL
+    urlDatabase[id].longURL = newURL; // Update the existing entry with the new URL
     res.redirect('/urls');
   } else {
     res.status(404).send('URL not found');
@@ -136,7 +136,7 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   const user = users[req.cookies["user_id"]] || null;
   const id = req.params.id;
-  const longURL = urlDatabase[id];
+  const longURL = urlDatabase[id].longURL;
   const templateVars = { user: user, id: id, longURL: longURL };
   res.render("urls_show", templateVars);
 });
@@ -144,7 +144,7 @@ app.get("/urls/:id", (req, res) => {
 // Redirect from a short URL to the actual URL
 app.get("/u/:id", (req, res) => {
   const shortURL = req.params.id;
-  const longURL = urlDatabase[shortURL]; // Gets the longURL associated with the shortURL then redirects
+  const longURL = urlDatabase[shortURL].longURL; // Gets the longURL associated with the shortURL then redirects
   if (longURL) {
     res.redirect(longURL);
   } else {
