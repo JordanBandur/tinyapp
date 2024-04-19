@@ -21,6 +21,18 @@ app.use(cookieSession({
 ///////////////////////////////////////////////////////
 
 const urlDatabase = {};
+// Each short URL entry will now also track visits and unique visitors
+const initializeURL = function(longURL, userID) {
+  const shortURL = generateRandomString();
+  urlDatabase[shortURL] = {
+    longURL,
+    userID,
+    visitCount: 0,
+    uniqueVisitors: new Set(),
+    visitDetails: []
+  };
+  return shortURL;
+};
 
 const users = {
   userRandomID: {
@@ -64,8 +76,7 @@ app.post("/urls", (req, res) => {
   if (!user) { // If the user is not logged in, send an HTML message and do not add the URL to the "database"
     return res.status(401).send('<html><body><p>You must be logged in to shorten URLs.</p></body></html>');
   }
-  const shortURL = generateRandomString(); // Generate a short URL identifier
-  urlDatabase[shortURL] = { longURL: req.body.longURL, userID: user.id };
+  const shortURL = initializeURL(req.body.longURL, user.id);
   res.redirect(`/urls/${shortURL}`); // Redirect to the page showing the new short URL
 });
 
@@ -127,33 +138,55 @@ app.get("/urls/:id", (req, res) => {
   const user = users[req.session.user_id] || null;
   const id = req.params.id;
 
-  // Check if user is logged in
   if (!user) {
     return res.status(401).send("Please log in to view this page.");
   }
-  // Check if the URL exists in the database
   if (!urlDatabase[id]) {
     return res.status(404).send("The requested URL does not exist.");
   }
-  // Check if the logged in user owns the URL
   if (urlDatabase[id].userID !== user.id) {
     return res.status(403).send("You do not have permission to view this URL.");
   }
 
-  const longURL = urlDatabase[id].longURL;
-  const templateVars = { user: user, id: id, longURL: longURL };
+  const templateVars = {
+    user: user,
+    id: id,
+    longURL: urlDatabase[id].longURL,
+    visitCount: urlDatabase[id].visitCount,
+    uniqueVisitorCount: urlDatabase[id].uniqueVisitors.size,
+    visits: urlDatabase[id].visitDetails || []
+  };
   res.render("urls_show", templateVars);
 });
 
 // Redirect from a short URL to the actual URL
 app.get("/u/:id", (req, res) => {
   const shortURL = req.params.id;
-  const longURL = urlDatabase[shortURL].longURL; // Gets the longURL associated with the shortURL then redirects
-  if (longURL) {
-    res.redirect(longURL);
-  } else {
-    res.status(404).send('URL not found');
+  if (!urlDatabase[shortURL]) {
+    return res.status(404).send('URL not found');
   }
+
+  // Increment the total visit count
+  urlDatabase[shortURL].visitCount++;
+
+  // Determine the visitor ID
+  let visitorID = req.session.visitorID;
+  if (!visitorID) {
+    visitorID = generateRandomString();
+    req.session.visitorID = visitorID;
+  }
+
+  // Add to unique visitors set
+  urlDatabase[shortURL].uniqueVisitors.add(visitorID);
+  let date = new Date();
+  const formattedDate = date.toLocaleString('en-US', { timeZoneName: 'short' }).toString();
+  // Log the visit
+  urlDatabase[shortURL].visitDetails.push({
+    timestamp: formattedDate,
+    visitorID
+  });
+
+  res.redirect(urlDatabase[shortURL].longURL);
 });
 
 ///////////////////////////////////////////////////////
