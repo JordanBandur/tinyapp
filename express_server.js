@@ -82,7 +82,7 @@ app.post("/urls", (req, res) => {
 });
 
 // Endpoint to update an existing URL
-app.post("/urls/:id/update", (req, res) => {
+app.put("/urls/:id", (req, res) => {
   const user = users[req.session.user_id] || null;
   const id = req.params.id;
 
