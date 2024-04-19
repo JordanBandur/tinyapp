@@ -31,7 +31,7 @@
           
         </p>
         <!-- Update Form -->
-        <form action="/urls/<%= id %>/update" method="POST" class="mt-4">
+        <form action="/urls/<%= id %>?_method=PUT" method="POST" class="mt-4">
           <div class="form-group">
             <label for="newURL" class="d-inline-block mr-2">Update URL:</label>
             <input type="url" class="form-control d-inline-block mr-2" style="width: auto;" id="newURL" name="newURL"
