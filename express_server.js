@@ -1,6 +1,7 @@
 const express = require("express");
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
+const methodOverride = require('method-override');
 const { getUserByEmail, generateRandomString, urlsForUser } = require("./helpers");
 const app = express();
 const PORT = 8080; // Default port 8080
@@ -13,8 +14,8 @@ app.use(express.json());
 app.use(cookieSession({
   name: 'session',
   keys: ['key1', 'key2'], // These are the keys used to encrypt the cookie
-  maxAge: 24 * 60 * 60 * 1000 // 24 hours cookie expiration
 }));
+app.use(methodOverride('_method'));
 
 ///////////////////////////////////////////////////////
 // Data storage
@@ -103,7 +104,7 @@ app.post("/urls/:id/update", (req, res) => {
 });
 
 // Endpoint for deleting URLs
-app.post("/urls/:id/delete", (req, res) => {
+app.delete("/urls/:id", (req, res) => {
   const user = users[req.session.user_id] || null;
   const id = req.params.id;
 
