@@ -39,7 +39,7 @@
               </td>
               <td>
                 <!-- Delete Form inside the cell -->
-                <form method="POST" action="/urls/<%= id %>/delete">
+                <form method="POST" action="/urls/<%= id %>?_method=DELETE">
                   <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
               </td>
