@@ -19,6 +19,16 @@
           Short URL ID: <a href="/u/<%= id %>">
             <%= id %>
           </a>
+          <div>
+            <p>Total Visits: <%= visitCount %></p>
+            <p>Unique Visitors: <%= uniqueVisitorCount %></p>
+            <ul>
+              <% visits.forEach(function(visit) { %>
+                <li>Visited at <%= visit.timestamp %> by visitor ID <%= visit.visitorID %></li>
+              <% }); %>
+            </ul>
+          </div>
+          
         </p>
         <!-- Update Form -->
         <form action="/urls/<%= id %>/update" method="POST" class="mt-4">
